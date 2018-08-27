@@ -1,6 +1,6 @@
 {
 	"name": "js-html-parser",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "A very fast HTML parser, generating a simplified DOM, with basic element query support.",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -53,10 +53,10 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/taoqf/node-fast-html-parser.git"
+		"url": "https://github.com/hoang-rio/js-html-parser.git"
 	},
 	"bugs": {
-		"url": "https://github.com/taoqf/node-fast-html-parser/issues"
+		"url": "https://github.com/hoang-rio/js-html-parser/issues"
 	},
-	"homepage": "https://github.com/taoqf/node-fast-html-parser"
+	"homepage": "https://github.com/hoang-rio/js-html-parser"
 }
