@@ -479,15 +479,19 @@ export class Matcher {
 		this.matchers = selector.split(' ').map((matcher) => {
 			if (pMatchFunctionCache[matcher])
 				return pMatchFunctionCache[matcher];
-			const parts = matcher.split('.');
-			const tagName = parts[0];
+			const parts = matcher.replace(/\[[^\[]+\]/g,'').split('.'); //Remove attribute from skip wrong split
+			let tagName = parts[0];
+			let attributes;
+			if (attributes = matcher.match(/\[[^\[]+\]/g)) {
+				tagName += attributes[0];
+			}
 			const classes = parts.slice(1).sort();
 			let source = '"use strict";';
 			if (tagName && tagName != '*') {
 				let matcher: RegExpMatchArray;
 				if (tagName[0] == '#') {
 					source += 'if (el.id != ' + JSON.stringify(tagName.substr(1)) + ') return false;';
-				} else if (matcher = tagName.match(/([a-z]+)\[\s*([^\^\*!\s]+)\s*(=|!=|\^=|\*=)\s*((((["'])([^\6]*)(["'])\6))|(\S*?))\]\s*/)) {
+				} else if (matcher = tagName.match(/([a-z]+)\[\s*([^\^\*!\s]+)\s*(=|!=|\^=|\*=)\s*((((["'])(.*)(["'])))|(\S*?))\]\s*/)) {
 					const tagNameRoot = matcher[1];
 					if (tagNameRoot) {
 						source += `if (el.tagName !== "${tagNameRoot}") {return false;}`

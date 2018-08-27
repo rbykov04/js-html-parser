@@ -291,6 +291,8 @@ describe('HTML Parser', function () {
 			root.querySelector('[property!="og"]').should.eql(root.firstChild.firstChild.firstChild);
 			root.querySelector('meta[property]').should.eql(root.firstChild.firstChild.firstChild);
 			root.querySelector('[property]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('meta[content^="http://data.chiasenhac.com"]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('meta[content*="http://data.chiasenhac.com"]').should.eql(root.firstChild.firstChild.firstChild);
 		});
 	});
 });
