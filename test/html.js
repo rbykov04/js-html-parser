@@ -16,6 +16,10 @@ describe('HTML Parser', function () {
 			var MatchesNothingButStarEl = new HTMLElement('_', {});
 			var withIdEl = new HTMLElement('p', { id: 'id' });
 			var withClassNameEl = new HTMLElement('a', { class: 'a b' });
+			var matcherAttr = new Matcher('meta[property="og:image"]');
+			var withTagNameAttribute = new HTMLElement('meta', {property: 'og:image'});
+
+			matcherAttr.advance(withTagNameAttribute).should.be.ok;
 
 			// console.log(util.inspect([withIdEl, withClassNameEl], {
 			//     showHidden: true,
@@ -270,6 +274,23 @@ describe('HTML Parser', function () {
 			var root = parseHTML('<my-widget></my-widget>');
 
 			root.firstChild.tagName.should.eql('my-widget');
+		});
+	});
+
+
+	describe('#querySelector() attribute', function() {
+		it('should return correct tag with attribute selector', function() {
+			var root = parseHTML('<html><head><meta property="og:image" content="http://data.chiasenhac.com/data/cover/94/93778.jpg" /></head></html');
+			root.querySelector('meta[property="og:image"]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('meta[property^="og"]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('meta[property*="og"]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('meta[property!="og"]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('[property="og:image"]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('[property^="og"]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('[property*="og"]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('[property!="og"]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('meta[property]').should.eql(root.firstChild.firstChild.firstChild);
+			root.querySelector('[property]').should.eql(root.firstChild.firstChild.firstChild);
 		});
 	});
 });

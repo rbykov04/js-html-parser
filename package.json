@@ -1,6 +1,6 @@
 {
-	"name": "node-html-parser",
-	"version": "1.1.9",
+	"name": "simple-html-parser",
+	"version": "1.0.0",
 	"description": "A very fast HTML parser, generating a simplified DOM, with basic element query support.",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -15,7 +15,8 @@
 	],
 	"author": "Xiaoyi Shi <ashi009@gmail.com>",
 	"contributors": [
-		"taoqf<tao_qiufeng@126.com>"
+		"taoqf<tao_qiufeng@126.com>",
+		"Hoang Rio <donghoang.nguyen@outlook.com>"
 	],
 	"license": "MIT",
 	"dependencies": {

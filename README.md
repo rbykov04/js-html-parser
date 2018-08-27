@@ -11,7 +11,7 @@ no closing `<li>`, `<td>` etc).
 ## Install
 
 ```shell
-npm install --save node-html-parser
+npm install --save simple-html-parser
 ```
 
 ## Performance
@@ -113,7 +113,7 @@ Remove whitespaces in this sub tree.
 
 Query CSS selector to find matching nodes.
 
-Note: only `tagName`, `#id`, `.class` selectors supported. And not behave the
+Note: Most of selector supported. And not behave the
 same as standard `querySelectorAll()` as it will _stop_ searching sub tree after
 find a match.
 

@@ -487,17 +487,36 @@ export class Matcher {
 				let matcher: RegExpMatchArray;
 				if (tagName[0] == '#') {
 					source += 'if (el.id != ' + JSON.stringify(tagName.substr(1)) + ') return false;';
-				} else if (matcher = tagName.match(/^\[\s*(\S+)\s*(=|!=)\s*((((["'])([^\6]*)\6))|(\S*?))\]\s*/)) {
-					const attr_key = matcher[1];
-					let method = matcher[2];
-					if (method !== '=' && method !== '!=') {
+				} else if (matcher = tagName.match(/([a-z]+)\[\s*([^\^\*!\s]+)\s*(=|!=|\^=|\*=)\s*((((["'])([^\6]*)(["'])\6))|(\S*?))\]\s*/)) {
+					const tagNameRoot = matcher[1];
+					if (tagNameRoot) {
+						source += `if (el.tagName !== "${tagNameRoot}") {return false;}`
+					}
+					const attr_key = matcher[2];
+					let method = matcher[3];
+					if (method !== '=' && method !== '!=' && method !== '^=' && method !== '*=') {
 						throw new Error('Selector not supported, Expect [key${op}value].op must be =,!=');
 					}
-					if (method === '=') {
-						method = '==';
+					const value = matcher[8] || matcher[9];
+					source = this.genSource(source, attr_key, method, value);
+				} else if (matcher = tagName.match(/^\[\s*([^\^\*!\s]+)\s*(=|!=|\^=|\*=)\s*((((["'])([^\6]*)\6))|(\S*?))\]\s*/)) {
+					const attr_key = matcher[1];
+					let method = matcher[2];
+					if (method !== '=' && method !== '!=' && method !== '^=' && method !== '*=') {
+						throw new Error('Selector not supported, Expect [key${op}value].op must be =,!=');
 					}
 					const value = matcher[7] || matcher[8];
-					source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val ${method} "${value}"){return true;}} return false;`;
+					source = this.genSource(source, attr_key, method, value);
+				} else if (matcher = tagName.match(/([a-z]+)\[\s*(\S+)\s*\]\s*/)) {
+					const tagNameRoot = matcher[1];
+					if (tagNameRoot) {
+						source += `if (el.tagName !== "${tagNameRoot}") {return false;}`
+					}
+					const attr_key = matcher[2];
+					source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}"){return true;}} return false;`;
+				} else if (matcher = tagName.match(/^\[\s*(\S+)\s*\]\s*/)) {
+					const attr_key = matcher[1];
+					source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}"){return true;}} return false;`;
 				} else {
 					source += 'if (el.tagName != ' + JSON.stringify(tagName) + ') return false;';
 				}
@@ -508,6 +527,19 @@ export class Matcher {
 			source += 'return true;';
 			return pMatchFunctionCache[matcher] = new Function('el', source) as MatherFunction;
 		});
+	}
+	genSource(source: string, attr_key: string, method: string, value: String): string {
+		if (method === '=') {
+			method = '==';
+		}
+		if (method === "==" || method === "!=") {
+			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val ${method} "${value}"){return true;}} return false;`;
+		} else if (method === "^=") {
+			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === 0){return true;}} return false;`;
+		} else if (method === "*=") {
+			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") > -1){return true;}} return false;`;
+		}
+		return source;
 	}
 	/**
 	 * Trying to advance match pointer
