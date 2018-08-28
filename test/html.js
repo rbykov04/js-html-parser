@@ -280,7 +280,7 @@ describe('HTML Parser', function () {
 
 	describe('#querySelector() attribute', function() {
 		it('should return correct tag with attribute selector', function() {
-			var root = parseHTML('<html><head><meta property="og:image" content="http://data.chiasenhac.com/data/cover/94/93778.jpg" /></head></html');
+			var root = parseHTML('<html><head><meta property="og:image" content="http://data.chiasenhac.com/data/cover/94/93778.jpg" /><meta href="https://abc.com"/></head></html');
 			root.querySelector('meta[property="og:image"]').should.eql(root.firstChild.firstChild.firstChild);
 			root.querySelector('meta[property^="og"]').should.eql(root.firstChild.firstChild.firstChild);
 			root.querySelector('meta[property*="og"]').should.eql(root.firstChild.firstChild.firstChild);
