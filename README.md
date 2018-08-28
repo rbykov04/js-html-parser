@@ -1,4 +1,4 @@
-# JS HTML Parser [![NPM version](https://badge.fury.io/js/js-html-parser.png)](http://badge.fury.io/js/js-html-parser)[![Build info](https://travis-ci.org/hoang-rio/js-html-parser.svg?branch=master)](https://travis-ci.org/hoang-rio/js-html-parser)
+# JS HTML Parser [![NPM version](https://badge.fury.io/js/js-html-parser.png)](http://badge.fury.io/js/js-html-parser) [![Build info](https://travis-ci.org/hoang-rio/js-html-parser.svg?branch=master)](https://travis-ci.org/hoang-rio/js-html-parser)
 
 Fast HTML Parser is a _very fast_ HTML parser. Which will generate a simplified
 DOM tree, with basic element query support.
@@ -113,7 +113,7 @@ Remove whitespaces in this sub tree.
 
 Query CSS selector to find matching nodes.
 
-Note: Most of selector supported. And not behave the
+Note: Most of selector supported except `nth-type-of`, `nth-child`, `:not` and multiple atrribute selector. And not behave the
 same as standard `querySelectorAll()` as it will _stop_ searching sub tree after
 find a match.
 
