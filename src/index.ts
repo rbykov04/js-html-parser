@@ -372,7 +372,7 @@ export class HTMLElement extends Node {
 						stack.pop();
 						continue;
 					}
-					if (state[2] = matcher.advance(el)) {
+					if (state[2] = matcher.advance(el, i)) {
 						if (matcher.matched) {
 							return el;
 						}
@@ -491,26 +491,26 @@ export class Matcher {
 				let matcher: RegExpMatchArray;
 				if (tagName[0] == '#') {
 					source += 'if (el.id != ' + JSON.stringify(tagName.substr(1)) + ') return false;';
-				} else if (matcher = tagName.match(/([a-z]+)\[\s*([^\^\*!\s]+)\s*(=|!=|\^=|\*=)\s*((((["'])(.*)(["'])))|(\S*?))\]\s*/)) {
+				} else if (matcher = tagName.match(/([a-z]+)\[\s*([^\^\*!\s\$]+)\s*(=|!=|\^=|\*=|\$=)\s*((((["'])(.*)(["'])))|(\S*?))\]\s*/)) {
 					const tagNameRoot = matcher[1];
 					if (tagNameRoot) {
 						source += `if (el.tagName !== "${tagNameRoot}") {return false;}`
 					}
 					const attr_key = matcher[2];
 					let method = matcher[3];
-					if (method !== '=' && method !== '!=' && method !== '^=' && method !== '*=') {
-						throw new Error('Selector not supported, Expect [key${op}value].op must be =,!=');
+					if (method !== '=' && method !== '!=' && method !== '^=' && method !== '*=' && method !== '$=') {
+						throw new Error('Selector not supported, Expect [key${op}value].op must be =,!=,^=,*=,$=');
 					}
 					const value = matcher[8] || matcher[9];
-					source = this.genSource(source, attr_key, method, value);
-				} else if (matcher = tagName.match(/^\[\s*([^\^\*!\s]+)\s*(=|!=|\^=|\*=)\s*((((["'])([^\6]*)\6))|(\S*?))\]\s*/)) {
+					source = this.genMethodSource(source, attr_key, method, value);
+				} else if (matcher = tagName.match(/^\[\s*([^\^\*!\s\$]+)\s*(=|!=|\^=|\*=|\$=)\s*((((["'])([^\6]*)\6))|(\S*?))\]\s*/)) {
 					const attr_key = matcher[1];
 					let method = matcher[2];
-					if (method !== '=' && method !== '!=' && method !== '^=' && method !== '*=') {
-						throw new Error('Selector not supported, Expect [key${op}value].op must be =,!=');
+					if (method !== '=' && method !== '!=' && method !== '^=' && method !== '*=' && method !== '$=') {
+						throw new Error('Selector not supported, Expect [key${op}value].op must be =,!=,^=,*=,$=');
 					}
 					const value = matcher[7] || matcher[8];
-					source = this.genSource(source, attr_key, method, value);
+					source = this.genMethodSource(source, attr_key, method, value);
 				} else if (matcher = tagName.match(/([a-z]+)\[\s*(\S+)\s*\]\s*/)) {
 					const tagNameRoot = matcher[1];
 					if (tagNameRoot) {
@@ -532,7 +532,14 @@ export class Matcher {
 			return pMatchFunctionCache[matcher] = new Function('el', source) as MatherFunction;
 		});
 	}
-	genSource(source: string, attr_key: string, method: string, value: String): string {
+	/**
+	 * Generate source with attribute selector
+	 * @param source 
+	 * @param attr_key 
+	 * @param method 
+	 * @param value 
+	 */
+	genMethodSource(source: string, attr_key: string, method: string, value: String): string {
 		if (method === '=') {
 			method = '==';
 		}
@@ -542,12 +549,15 @@ export class Matcher {
 			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === 0){return true;}} return false;`;
 		} else if (method === "*=") {
 			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") > -1){return true;}} return false;`;
+		} else if (method === "$=") {
+			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === (val.length - ${value.length})){return true;}} return false;`;
 		}
 		return source;
 	}
 	/**
 	 * Trying to advance match pointer
 	 * @param  {HTMLElement} el element to make the match
+	 * @param  {Number} index Index of current element
 	 * @return {bool}           true when pointer advanced.
 	 */
 	advance(el: Node) {

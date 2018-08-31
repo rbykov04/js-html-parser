@@ -258,32 +258,39 @@ describe('HTML Parser', function () {
 				root.toString().should.eql('<div>abc</div>');
 			});
 		});
-        describe('#querySelector() attribute', function() {
-            it('should return correct tag with attribute selector', function() {
-                var root = parseHTML('<html><head><meta property="og:image" content="http://data.chiasenhac.com/data/cover/94/93778.jpg" /><meta href="https://abc.com"/></head></html');
-                root.querySelector('meta[property="og:image"]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('meta[property^="og"]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('meta[property*="og"]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('meta[property!="og"]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('[property="og:image"]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('[property^="og"]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('[property*="og"]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('[property!="og"]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('meta[property]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('[property]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('meta[content^="http://data.chiasenhac.com"]').should.eql(root.firstChild.firstChild.firstChild);
-                root.querySelector('meta[content*="http://data.chiasenhac.com"]').should.eql(root.firstChild.firstChild.firstChild);
-            });
-        });
+		describe('#querySelector() attribute', function() {
+			var root = parseHTML('<html><head><meta property="og:image" content="http://data.chiasenhac.com/data/cover/94/93778.jpg" /><meta href="https://abc.com"/></head></html');
+			it('attribute selector with tag name', function() {
+				root.querySelector('meta[property="og:image"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta[property^="og"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta[property*="og"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta[property!="og"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta[property$="image"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta[property]').should.eql(root.firstChild.firstChild.firstChild);
+			});
+			it('attribute selector without tag name', function() {
+				root.querySelector('[property="og:image"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('[property^="og"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('[property*="og"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('[property!="og"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('[property$="image"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('[property]').should.eql(root.firstChild.firstChild.firstChild);
+			});
+			it('attribute selector with dot (.) in attribute value', function() {
+				root.querySelector('meta[content^="http://data.chiasenhac.com"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta[content*="http://data.chiasenhac.com"]').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta[content$=".jpg"]').should.eql(root.firstChild.firstChild.firstChild);
+			});
+		});
 	});
 
 	describe('stringify', function () {
 		describe('#toString()', function () {
-            it('should return correct input html', function(){
-                const html = '<p id="id" data-feidao-actions="ssss"><a class=\'cls\'>Hello</a><ul><li>aaaaa</li></ul><span>bbb</span></p>';
-                const root = parseHTML(html);
-                root.toString().should.eql(html);
-            });
+			it('should return correct input html', function(){
+				const html = '<p id="id" data-feidao-actions="ssss"><a class=\'cls\'>Hello</a><ul><li>aaaaa</li></ul><span>bbb</span></p>';
+				const root = parseHTML(html);
+				root.toString().should.eql(html);
+			});
 		});
 	});
 
