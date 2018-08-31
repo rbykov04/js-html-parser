@@ -372,7 +372,7 @@ export class HTMLElement extends Node {
 						stack.pop();
 						continue;
 					}
-					if (state[2] = matcher.advance(el, i)) {
+					if (state[2] = matcher.advance(el)) {
 						if (matcher.matched) {
 							return el;
 						}
