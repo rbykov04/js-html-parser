@@ -295,4 +295,12 @@ describe('HTML Parser', function () {
 			root.querySelector('meta[content*="http://data.chiasenhac.com"]').should.eql(root.firstChild.firstChild.firstChild);
 		});
 	});
+  describe('Custom Element multiple dash', function () {
+    it('parse "<my-new-widget></my-new-widget>" tagName should be "my-new-widget"', function () {
+
+      var root = parseHTML('<my-new-widget></my-new-widget>');
+
+      root.firstChild.tagName.should.eql('my-new-widget');
+    });
+  });
 });
