@@ -63,6 +63,7 @@ root.toString();	// <li>Hello World</li>
 var HTMLParser = require('js-html-parser');
 
 var root = HTMLParser.parse('<ul id="list"><li>Hello World</li></ul>');
+var ul = root.querySelector('#list');
 ```
 
 ## API
@@ -113,7 +114,7 @@ Remove whitespaces in this sub tree.
 
 Query CSS selector to find matching nodes.
 
-Note: Most of selector supported except `nth-type-of`, `nth-child`, `:not` and multiple atrribute selector. And not behave the
+Note: Most of selector supported except `nth-type-of`, `nth-child`, `:not` and multiple attribute selector. And not behave the
 same as standard `querySelectorAll()` as it will _stop_ searching sub tree after
 find a match.
 
