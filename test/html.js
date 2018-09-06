@@ -282,6 +282,10 @@ describe('HTML Parser', function () {
 				root.querySelector('meta[content$=".jpg"]').should.eql(root.firstChild.firstChild.firstChild);
 			});
 		});
+		describe('#querySelector() with :not pseudo', function () {
+			var root = parseHTML('<html><head><meta property="og:image" content="http://data.chiasenhac.com/data/cover/94/93778.jpg" class="true"/><meta class="false" property="og:image" href="https://abc.com"/></head></html');
+			root.querySelector('meta:not(.true)').should.eql(root.firstChild.firstChild.childNodes[1]);
+		});
 	});
 
 	describe('stringify', function () {

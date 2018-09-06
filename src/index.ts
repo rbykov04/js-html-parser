@@ -479,7 +479,7 @@ export class Matcher {
 		this.matchers = selector.split(' ').map((matcher) => {
 			if (pMatchFunctionCache[matcher])
 				return pMatchFunctionCache[matcher];
-			const parts = matcher.replace(/\[[^\[]+\]/g,'').split('.'); //Remove attribute from skip wrong split
+			const parts = matcher.replace(/\[[^\[]+\]/g,'').replace(/\:([\w-]+)\((.*)\)/g, '').split('.'); //Remove attribute from skip wrong split
 			let tagName = parts[0];
 			let attributes;
 			if (attributes = matcher.match(/\[[^\[]+\]/g)) {
@@ -487,6 +487,16 @@ export class Matcher {
 			}
 			const classes = parts.slice(1).sort();
 			let source = '"use strict";';
+			let pseudos;
+			if (pseudos = matcher.match(/\:([\w-]+)\((.*)\)/i)) {
+				if (pseudos[1] !== 'not') {
+					throw new Error('Pseudo selector not supported, Currently on ly support :not pseudo');
+				}
+				source = this.genPseudoSource(source, pseudos);
+			}
+			if (classes.length > 0) {
+				source += 'for (var cls = ' + JSON.stringify(classes) + ', i = 0; i < cls.length; i++){ if (el.classNames.indexOf(cls[i]) === -1) {return false;}}';
+			}
 			if (tagName && tagName != '*') {
 				let matcher: RegExpMatchArray;
 				if (tagName[0] == '#') {
@@ -525,9 +535,6 @@ export class Matcher {
 					source += 'if (el.tagName != ' + JSON.stringify(tagName) + ') return false;';
 				}
 			}
-			if (classes.length > 0) {
-				source += 'for (var cls = ' + JSON.stringify(classes) + ', i = 0; i < cls.length; i++) if (el.classNames.indexOf(cls[i]) === -1) return false;';
-			}
 			source += 'return true;';
 			return pMatchFunctionCache[matcher] = new Function('el', source) as MatherFunction;
 		});
@@ -551,6 +558,22 @@ export class Matcher {
 			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") > -1){return true;}} return false;`;
 		} else if (method === "$=") {
 			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === (val.length - ${value.length})){return true;}} return false;`;
+		}
+		return source;
+	}
+	/**
+	 * Generate pseudo not selector
+	 * @param source function source
+	 * @param pseudos Match pseudo
+	 */
+	genPseudoSource(source: string, pseudos: Array<string>): string {
+		const notSelector = pseudos[2]; //May be [attr], [attr="something"], .abc
+		//Process not class first
+		if (notSelector.indexOf('.') === 0) {
+			const classes = notSelector.split('.').filter(item=>{
+				return item && item !== '';
+			});
+			source += 'for (var clsN = ' + JSON.stringify(classes) + ', i = 0; i < clsN.length; i++){ if (el.classNames.indexOf(clsN[i]) !== -1){ return false;}}'
 		}
 		return source;
 	}
