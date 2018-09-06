@@ -479,10 +479,10 @@ export class Matcher {
 		this.matchers = selector.split(' ').map((matcher) => {
 			if (pMatchFunctionCache[matcher])
 				return pMatchFunctionCache[matcher];
-			const parts = matcher.replace(/\[[^\[]+\]/g,'').replace(/\:([\w-]+)\((.*)\)/g, '').split('.'); //Remove attribute from skip wrong split
+			const parts = matcher.replace(/\:([\w-]+)\((.*)\)/g, '').replace(/\[[^\[]+\]/g,'').split('.'); //Remove attribute from skip wrong split
 			let tagName = parts[0];
 			let attributes;
-			if (attributes = matcher.match(/\[[^\[]+\]/g)) {
+			if (attributes = matcher.replace(/\:([\w-]+)\((.*)\)/g, '').match(/\[[^\[]+\]/g)) {
 				tagName += attributes[0];
 			}
 			const classes = parts.slice(1).sort();
@@ -545,19 +545,24 @@ export class Matcher {
 	 * @param attr_key 
 	 * @param method 
 	 * @param value 
+	 * @param type Type equal or not equal
 	 */
-	genMethodSource(source: string, attr_key: string, method: string, value: String): string {
+	genMethodSource(source: string, attr_key: string, method: string, value: String, type = true): string {
 		if (method === '=') {
 			method = '==';
 		}
+		let returnType = '{return true;}} return false;';
+		if (!type) {
+			returnType = '{return false;}}'
+		}
 		if (method === "==" || method === "!=") {
-			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val ${method} "${value}"){return true;}} return false;`;
+			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val ${method} "${value}")${returnType}`;
 		} else if (method === "^=") {
-			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === 0){return true;}} return false;`;
+			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === 0)${returnType}`;
 		} else if (method === "*=") {
-			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") > -1){return true;}} return false;`;
+			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") > -1)${returnType}`;
 		} else if (method === "$=") {
-			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === (val.length - ${value.length})){return true;}} return false;`;
+			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === (val.length - ${value.length}))${returnType}`;
 		}
 		return source;
 	}
@@ -574,6 +579,20 @@ export class Matcher {
 				return item && item !== '';
 			});
 			source += 'for (var clsN = ' + JSON.stringify(classes) + ', i = 0; i < clsN.length; i++){ if (el.classNames.indexOf(clsN[i]) !== -1){ return false;}}'
+		}
+		let matcher;
+		//Process attribute
+		if (matcher = notSelector.match(/^\[\s*([^\^\*!\s\$]+)\s*(=|!=|\^=|\*=|\$=)\s*((((["'])([^\6]*)\6))|(\S*?))\]\s*/)) {
+			const attr_key = matcher[1];
+			let method = matcher[2];
+			if (method !== '=' && method !== '!=' && method !== '^=' && method !== '*=' && method !== '$=') {
+				throw new Error('Selector not supported, Expect [key${op}value].op must be =,!=,^=,*=,$=');
+			}
+			const value = matcher[7] || matcher[8];
+			source = this.genMethodSource(source, attr_key, method, value, false);
+		} else if (matcher = notSelector.match(/^\[\s*(\S+)\s*\]\s*/)) {
+			const attr_key = matcher[1];
+			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}"){return false;}}`;
 		}
 		return source;
 	}

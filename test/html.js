@@ -282,9 +282,17 @@ describe('HTML Parser', function () {
 				root.querySelector('meta[content$=".jpg"]').should.eql(root.firstChild.firstChild.firstChild);
 			});
 		});
+
 		describe('#querySelector() with :not pseudo', function () {
-			var root = parseHTML('<html><head><meta property="og:image" content="http://data.chiasenhac.com/data/cover/94/93778.jpg" class="true"/><meta class="false" property="og:image" href="https://abc.com"/></head></html');
-			root.querySelector('meta:not(.true)').should.eql(root.firstChild.firstChild.childNodes[1]);
+			it('Pseudo :not selector without atribute selector', function () {
+				var root = parseHTML('<html><head><meta property="og:image" content="http://data.chiasenhac.com/data/cover/94/93778.jpg" class="true" href="http://abc.com"/><meta class="false" property="og:image" data="abc" href="https://abc.com.vn"/></head></html');
+				root.querySelector('meta:not([data])').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta:not([data="abc"])').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta:not([href^="https"])').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta:not([href$=".vn"])').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta:not([href*=".vn"])').should.eql(root.firstChild.firstChild.firstChild);
+				root.querySelector('meta:not(.true)').should.eql(root.firstChild.firstChild.childNodes[1]);
+			});
 		});
 	});
 
