@@ -9,7 +9,7 @@ describe('Incorrect HTML Parser ', function () {
     var parseHTML = HTMLParser.parse;
 
     describe("Incorrect tag parser", function () {
-        var htmlContent = fs.readFileSync(__dirname + '/html/search.html').toString();
+        var htmlContent = fs.readFileSync(__dirname + '/html/search').toString();
         it('Mixed item must parse able', function () {
             var matchesTr = htmlContent.match(/<tr title.+?>[^tr]+<\/tr>/gs);
             var list_v_m = [];
@@ -74,7 +74,7 @@ describe('Incorrect HTML Parser ', function () {
             list_album.length.should.eql(3);
         });
         it('[Album search mode] Album item must be parser correct', function () {
-            var htmlContentAlbum = fs.readFileSync(__dirname + '/html/search-album.html').toString();
+            var htmlContentAlbum = fs.readFileSync(__dirname + '/html/search-album').toString();
             var list_album = [];
             var list_tr = htmlContentAlbum.match(/<tr class.+?>[^tr]+<\/tr>/gs);
             for (let i = 0; i <= list_tr.length - 2; i += 2) {
