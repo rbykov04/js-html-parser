@@ -527,10 +527,10 @@ export class Matcher {
 						source += `if (el.tagName !== "${tagNameRoot}") {return false;}`
 					}
 					const attr_key = matcher[2];
-					source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}"){return true;}} return false;`;
+					source += `var attrs = el.attributes;for (var key in attrs){var val = attrs[key]; if (key == "${attr_key}"){return true;}} return false;`;
 				} else if (matcher = tagName.match(/^\[\s*(\S+)\s*\]\s*/)) {
 					const attr_key = matcher[1];
-					source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}"){return true;}} return false;`;
+					source += `var attrs = el.attributes;for (var key in attrs){var val = attrs[key]; if (key == "${attr_key}"){return true;}} return false;`;
 				} else {
 					source += 'if (el.tagName != ' + JSON.stringify(tagName) + ') return false;';
 				}
@@ -556,13 +556,13 @@ export class Matcher {
 			returnType = '{return false;}}'
 		}
 		if (method === "==" || method === "!=") {
-			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val ${method} "${value}")${returnType}`;
+			source += `var attrs = el.attributes;for (var key in attrs){var val = attrs[key]; if (key == "${attr_key}" && val ${method} "${value}")${returnType}`;
 		} else if (method === "^=") {
-			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === 0)${returnType}`;
+			source += `var attrs = el.attributes;for (var key in attrs){var val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === 0)${returnType}`;
 		} else if (method === "*=") {
-			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") > -1)${returnType}`;
+			source += `var attrs = el.attributes;for (var key in attrs){var val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") > -1)${returnType}`;
 		} else if (method === "$=") {
-			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === (val.length - ${value.length}))${returnType}`;
+			source += `var attrs = el.attributes;for (var key in attrs){var val = attrs[key]; if (key == "${attr_key}" && val.indexOf("${value}") === (val.length - ${value.length}))${returnType}`;
 		}
 		return source;
 	}
@@ -592,7 +592,7 @@ export class Matcher {
 			source = this.genMethodSource(source, attr_key, method, value, false);
 		} else if (matcher = notSelector.match(/^\[\s*(\S+)\s*\]\s*/)) {
 			const attr_key = matcher[1];
-			source += `var attrs = el.attributes;for (var key in attrs){const val = attrs[key]; if (key == "${attr_key}"){return false;}}`;
+			source += `var attrs = el.attributes;for (var key in attrs){var val = attrs[key]; if (key == "${attr_key}"){return false;}}`;
 		}
 		return source;
 	}
