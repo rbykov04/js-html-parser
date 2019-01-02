@@ -1,6 +1,6 @@
 # JS HTML Parser [![NPM version](https://badge.fury.io/js/js-html-parser.png)](http://badge.fury.io/js/js-html-parser) [![Build info](https://travis-ci.org/hoang-rio/js-html-parser.svg?branch=master)](https://travis-ci.org/hoang-rio/js-html-parser)
 
-Fast HTML Parser is a _very fast_ HTML parser. Which will generate a simplified
+JS HTML Parser is a _very fast_ HTML parser. Which will generate a simplified
 DOM tree, with basic element query support.
 
 Per the design, it intends to parse massive HTML files in lowest price, thus the
