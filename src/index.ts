@@ -666,7 +666,7 @@ const kElementsClosedByClosing = {
 	th: { tr: true, table: true }
 };
 const kBlockTextElements = {
-	script: true,
+	// script: true,
 	noscript: true,
 	style: true,
 	pre: true
