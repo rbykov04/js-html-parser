@@ -36,7 +36,7 @@
     "should": "latest",
     "spec": "latest",
     "travis-cov": "latest",
-    "typescript": "next"
+    "typescript": "3.9.2"
   },
   "config": {
     "blanket": {
